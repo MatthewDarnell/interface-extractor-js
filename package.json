@@ -1,0 +1,21 @@
+{
+  "name": "interface-extractor",
+  "version": "0.0.0",
+  "description": "Extracts interface out of a qubic's source.",
+  "main": "./src/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "Chris Dukakis <chrisdukakis@gmail.com>",
+  "dependencies": {
+    "@babel/core": "^7.17.9",
+    "@babel/plugin-transform-runtime": "^7.17.0",
+    "@babel/preset-env": "^7.16.11",
+    "node-c-lexer": "^1.0.5"
+  },
+  "devDependencies": {
+    "jest": "^27.5.1",
+    "nyc": "^15.1.0"
+  }
+}
