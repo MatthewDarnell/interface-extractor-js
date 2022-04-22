@@ -1,10 +1,14 @@
 'use strict';
 
 import lexer from 'node-c-lexer';
+import { tokenize } from 'node-c-lexer/lib/lex-unit';
 
-const extractInterface = function (sourceText) {
+const extractInterface = function (qubicName, sourceText) {
   const tokens = lexer.lexUnit.tokenize(sourceText);
-  const extractedInterface = [];
+  const extractedInterface = {
+    structures: [],
+    functions: [],
+  };
   let structure = undefined;
   let member = undefined;
   let memberType = undefined;
@@ -22,34 +26,29 @@ const extractInterface = function (sourceText) {
         comment = undefined;
       }
     }
-
-    if (memberType !== undefined) {
-      memberType += memberType === '' ? token.lexeme : (token.lexeme === '*' ? '' : ' ') + token.lexeme;
-    }
+    
+    memberType += memberType === '' ? token.lexeme : (token.lexeme === '*' ? '' : ' ') + token.lexeme;
   }
 
   const stripCommentIdentifiers = function (comment) {
     if (comment.slice(0, 2) === '//') {
       comment = comment.slice(2);
-    } else if (comment.slice(0, 2) === '/*') {
+    } else {
       comment = comment.slice(2, -2);
     }
     return comment.trim();
   }
 
-  tokens.forEach(function (token) {
-
+  tokens.forEach(function (token, i) {
     switch (token.tokenClass) {
       case 'STRUCT':
-        if (structure === undefined) {
-          structure = {
-            identifier: '',
-            members: [],
-            row: token.row,
-            col: token.col,
-          }
-          memberType = '';
+        structure = {
+          identifier: '',
+          members: [],
+          row: token.row,
+          col: token.col,
         }
+        memberType = '';
         break;
 
       case 'COMMENT':
@@ -72,7 +71,7 @@ const extractInterface = function (sourceText) {
         break;
 
       case 'IDENTIFIER':
-        if (structure?.lexeme === '') {
+        if (structure?.identifier === '') {
           structure.identifier = token.lexeme;
         }
 
@@ -115,10 +114,40 @@ const extractInterface = function (sourceText) {
         extractType(token);
         break;
 
+      case 'VOID':
+        if (tokens[i + 1].lexeme.split('_')[0] === qubicName) {
+          let j = i + 3;
+          const arg = [];
+          while (tokens[j].tokenClass !== ')') {
+            arg.push(tokens[j])
+            j++;
+          }
+          const fn = {
+            row: token.row,
+            col: token.col,
+            identifier: tokens[i + 1].lexeme,
+            argument: {
+              row: arg[0].row,
+              col: arg[0].col,
+              type: arg.slice(0, -1).map(function (token) {
+                return token.lexeme;
+              }).join(' '),
+              identifier: arg[arg.length - 1].lexeme,
+            },
+          }
+          if (comment !== undefined) {
+            fn.comment = comment;
+            comment = undefined;
+          }
+          lastMember = fn;
+          extractedInterface.functions.push(fn)
+        }
+        break;
+
       case '}':
         if (structure !== undefined) {
-          if (structure.members.length > 0) {
-            extractedInterface.push(structure);
+          if (structure.identifier.split('_')[0] === qubicName) {
+            extractedInterface.structures.push(structure);
           }
           memberType = undefined;
           structure = undefined;
