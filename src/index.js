@@ -1,7 +1,6 @@
 'use strict';
 
 import lexer from 'node-c-lexer';
-import { tokenize } from 'node-c-lexer/lib/lex-unit';
 
 const extractInterface = function (qubicName, sourceText) {
   const tokens = lexer.lexUnit.tokenize(sourceText);
@@ -115,32 +114,34 @@ const extractInterface = function (qubicName, sourceText) {
         break;
 
       case 'VOID':
-        if (tokens[i + 1].lexeme.split('_')[0] === qubicName) {
+        if (tokens[i + 1]?.lexeme?.split('_')?.[0] === qubicName) {
           let j = i + 3;
-          const arg = [];
-          while (tokens[j].tokenClass !== ')') {
-            arg.push(tokens[j])
-            j++;
+          if (tokens[j]) {
+            const arg = [];
+            while (tokens[j].tokenClass !== ')') {
+              arg.push(tokens[j])
+              j++;
+            }
+            const fn = {
+              row: token.row,
+              col: token.col,
+              identifier: tokens[i + 1].lexeme,
+              argument: {
+                row: arg[0].row,
+                col: arg[0].col,
+                type: arg.slice(0, -1).map(function (token) {
+                  return token.lexeme;
+                }).join(' '),
+                identifier: arg[arg.length - 1].lexeme,
+              },
+            }
+            if (comment !== undefined) {
+              fn.comment = comment;
+              comment = undefined;
+            }
+            lastMember = fn;
+            extractedInterface.functions.push(fn);
           }
-          const fn = {
-            row: token.row,
-            col: token.col,
-            identifier: tokens[i + 1].lexeme,
-            argument: {
-              row: arg[0].row,
-              col: arg[0].col,
-              type: arg.slice(0, -1).map(function (token) {
-                return token.lexeme;
-              }).join(' '),
-              identifier: arg[arg.length - 1].lexeme,
-            },
-          }
-          if (comment !== undefined) {
-            fn.comment = comment;
-            comment = undefined;
-          }
-          lastMember = fn;
-          extractedInterface.functions.push(fn)
         }
         break;
 

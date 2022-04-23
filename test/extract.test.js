@@ -12,7 +12,7 @@ describe('extractInterface', function () {
       short testShort;
       signed int testInt;
       /*
-        TestUint description.  
+        TestUint description.
       */
       /*
         Additional description.
@@ -30,15 +30,17 @@ describe('extractInterface', function () {
     */
     void SecureQus(Void effect) { // Test.
 
-    }
+    };
 
     void SecureQus(SecureQus_Withdraw effect) {
 
-    }
+    };
 
     void Test2() {
-    }
-  `;
+    };
+
+    void SecureQus(
+`;
 
   const actual = extractInterface('SecureQus', sourceText)
 
