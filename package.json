@@ -9,13 +9,15 @@
   },
   "author": "Chris Dukakis <chrisdukakis@gmail.com>",
   "dependencies": {
+    "web-tree-sitter": "^0.20.5"
+  },
+  "devDependencies": {
     "@babel/core": "^7.17.9",
     "@babel/plugin-transform-runtime": "^7.17.0",
     "@babel/preset-env": "^7.16.11",
-    "node-c-lexer": "^1.0.5"
-  },
-  "devDependencies": {
     "jest": "^27.5.1",
-    "nyc": "^15.1.0"
+    "nyc": "^15.1.0",
+    "tree-sitter-cli": "^0.20.6",
+    "tree-sitter-cpp": "^0.20.0"
   }
 }
