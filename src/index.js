@@ -112,8 +112,8 @@ const extractInterface = async function (qubicName, sourceText) {
                     }
                 }
               });
-            }
-          });
+          }
+        });
         
           if (struct.type.text.split('_')[0] === qubicName) {
             structs.push(struct);
@@ -125,14 +125,14 @@ const extractInterface = async function (qubicName, sourceText) {
             break;
           
           case 'declaration':
-            const fn = {};
-
-            if (comment !== undefined) {
-              fn.comment = comment;
-              comment = undefined;
-            }
-
             if (node.children[0]?.type === 'primitive_type' && node.children[0]?.text === 'void') {
+              const fn = {};
+
+              if (comment !== undefined) {
+                fn.comment = comment;
+                comment = undefined;
+              }
+
               fn.type = {
                 text: node.children[0].text,
                 startIndex: node.children[0].startIndex,
@@ -140,41 +140,41 @@ const extractInterface = async function (qubicName, sourceText) {
                 startPosition: node.children[0].startPosition,
                 endPosition: node.children[0].endPosition,
               }
-            }
 
-            fn.identifier = {
-              text: node.children[1].children[0].children[0].text,
-              startIndex: node.children[1].children[0].children[0].startIndex,
-              endIndex: node.children[1].children[0].children[0].endIndex,
-              startPosition: node.children[1].children[0].children[0].startPosition,
-              endPosition: node.children[1].children[0].children[0].endPosition,
-            }
-
-            fn.arguments = [];
-            node.children[1].children[0].children[1].children.forEach(function (node2) {
-              if (node2.type === 'parameter_declaration') {
-                fn.arguments.push({
-                  type: {
-                    text: node2.children[0].text,
-                    startIndex: node2.children[0].startIndex,
-                    endIndex: node2.children[0].endIndex,
-                    startPosition: node2.children[0].startPosition,
-                    endPosition: node2.children[0].endPosition,
-                  },
-                  identifier: {
-                    text: node2.children[1].text,
-                    startIndex: node2.children[1].startIndex,
-                    endIndex: node2.children[1].endIndex,
-                    startPosition: node2.children[1].startPosition,
-                    endPosition: node2.children[1].endPosition,
-                  }
-                })
+              fn.identifier = {
+                text: node.children[1].children[0].children[0].text,
+                startIndex: node.children[1].children[0].children[0].startIndex,
+                endIndex: node.children[1].children[0].children[0].endIndex,
+                startPosition: node.children[1].children[0].children[0].startPosition,
+                endPosition: node.children[1].children[0].children[0].endPosition,
               }
-            });
 
-            if (fn.identifier !== undefined && fn.identifier.text.split('_')[0] === qubicName) {
-              functions.push(fn);
-            }
+              fn.arguments = [];
+              node.children[1].children[0].children[1].children.forEach(function (node2) {
+                if (node2.type === 'parameter_declaration') {
+                  fn.arguments.push({
+                    type: {
+                      text: node2.children[0].text,
+                      startIndex: node2.children[0].startIndex,
+                      endIndex: node2.children[0].endIndex,
+                      startPosition: node2.children[0].startPosition,
+                      endPosition: node2.children[0].endPosition,
+                    },
+                    identifier: {
+                      text: node2.children[1].text,
+                      startIndex: node2.children[1].startIndex,
+                      endIndex: node2.children[1].endIndex,
+                      startPosition: node2.children[1].startPosition,
+                      endPosition: node2.children[1].endPosition,
+                    }
+                  })
+                }
+              });
+
+              if (fn.identifier !== undefined && fn.identifier.text.split('_')[0] === qubicName) {
+                functions.push(fn);
+              }
+          }
     }
   });
 

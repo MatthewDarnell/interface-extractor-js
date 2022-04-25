@@ -54,6 +54,8 @@ describe('extractInterface', function () {
     void Test3() {
     };
 
+    int test;
+
     void SecureQus(
 `;
 
